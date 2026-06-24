@@ -164,7 +164,7 @@
 
   /* ---------- tratamientos: secuencia de videos por scroll ---------- */
   #tratamientos{padding-bottom:0}
-  .trat{position:relative;height:440vh}
+  .trat{position:relative;height:400vh}
   .trat-sticky{position:sticky;top:0;height:100vh;display:flex;align-items:center;overflow:hidden}
   .trat-sticky .wrap{width:100%}
   .trat-stage{position:relative;min-height:66vh}
@@ -260,8 +260,8 @@
 
   /* foto del doctor: por defecto visible; cuando entra en pantalla (.in) se
      reproduce el ensanchado desde la izquierda. Si no se dispara, queda visible igual. */
-  @keyframes photoIn{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
-  .doc-photo.in{animation:photoIn 1.2s cubic-bezier(.6,0,.16,1) both}
+  html.js .doc-photo{clip-path:inset(0 100% 0 0);transition:clip-path 1.2s cubic-bezier(.6,0,.16,1)}
+  html.js .doc-photo.in{clip-path:inset(0 0 0 0)}
 
   /* palabras que suben desde abajo a medida que se hace scroll */
   .fw{display:inline-block}
@@ -335,7 +335,7 @@
     .btn:hover,.info:hover{transform:none}
     .hero-inner>*,.hero-sig{animation:none!important;opacity:1}
     .trust-track{animation:none}
-    .doc-photo.in{animation:none;clip-path:none}
+    html.js .doc-photo,html.js .doc-photo.in{clip-path:none;transition:none}
     html.js .fw{opacity:1;transform:none}
   }
 </style>
@@ -698,6 +698,8 @@
     entries.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});
   },{threshold:.14});
   document.querySelectorAll('.reveal,.swipe').forEach(el=>io.observe(el));
+  // red de seguridad: si el observer no se dispara, revela la foto igual
+  setTimeout(()=>document.querySelectorAll('.swipe:not(.in)').forEach(el=>el.classList.add('in')),3500);
 
   // ====== las palabras suben desde abajo a medida que se hace scroll ======
   const root=document.documentElement;
@@ -815,8 +817,8 @@
       const g=cl(-rect.top/span);
       panels.forEach((p,i)=>{
         const phi=g*(N-1)-i;
-        const enter=sm(cl((phi+0.7)/0.7));
-        const exit =sm(cl((phi-0.30)/0.7));
+        const enter=sm(cl((phi+0.96)/0.96));   // empieza a entrar antes (ventana más amplia)
+        const exit =sm(cl((phi-0.06)/0.96));    // y a salir casi apenas pasa el centro
         const op=enter*(1-exit);
         p.style.opacity=op.toFixed(3);
         p.style.transform='translateX('+((1-enter)*42+exit*-10).toFixed(2)+'%) scale('+(1-exit*0.18).toFixed(3)+')';
